@@ -1,0 +1,1238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sneha & Saran - Wedding Invitation</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Canvas Confetti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700;800&family=Great+Vibes&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --maroon: #6B0F1A;
+            --maroon-dark: #4A0810;
+            --gold: #D4AF37;
+            --gold-light: #F3E5AB;
+            --gold-dark: #AA7C11;
+            --cream-bg: #FFFDF7;
+            --pink-accent: #E85D75;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #120205;
+            color: #333;
+            overflow-x: hidden;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        .font-serif-title {
+            font-family: 'Cinzel', serif;
+        }
+
+        .font-cursive {
+            font-family: 'Great Vibes', cursive;
+        }
+
+        /* Gold Gradient Borders & Text */
+        .gold-gradient-text {
+            background: linear-gradient(135deg, #bf953f, #fcf6ba, #b38728, #fbf5b7, #aa771c);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .gold-border {
+            border-image: linear-gradient(to bottom right, #bf953f, #fcf6ba, #aa771c) 1;
+        }
+
+        /* Petal Floating Overlay Canvas */
+        #petalCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            z-index: 40;
+        }
+
+        /* Door Animation Styles */
+        .door-container {
+            perspective: 1200px;
+        }
+
+        .door-left {
+            transform-origin: left center;
+            transition: transform 1.5s cubic-bezier(0.77, 0, 0.175, 1);
+        }
+
+        .door-right {
+            transform-origin: right center;
+            transition: transform 1.5s cubic-bezier(0.77, 0, 0.175, 1);
+        }
+
+        .doors-open .door-left {
+            transform: rotateY(-110deg);
+        }
+
+        .doors-open .door-right {
+            transform: rotateY(110deg);
+        }
+
+        /* Modal Overlay Animations */
+        .modal-enter {
+            animation: modalFadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        @keyframes modalFadeIn {
+            from { opacity: 0; transform: scale(0.92); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        /* Pulse Animations */
+        .pulse-gold {
+            animation: pulseGold 2s infinite;
+        }
+
+        @keyframes pulseGold {
+            0% { box-shadow: 0 0 0 0 rgba(212, 175, 55, 0.7); }
+            70% { box-shadow: 0 0 0 15px rgba(212, 175, 55, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(212, 175, 55, 0); }
+        }
+
+        /* Dhol Vibration Effect */
+        @keyframes dholShake {
+            0% { transform: scale(1) rotate(0deg); }
+            20% { transform: scale(1.08) rotate(-4deg); }
+            40% { transform: scale(0.95) rotate(4deg); }
+            60% { transform: scale(1.05) rotate(-2deg); }
+            80% { transform: scale(0.98) rotate(2deg); }
+            100% { transform: scale(1) rotate(0deg); }
+        }
+
+        .dhol-vibrate {
+            animation: dholShake 0.3s ease-in-out;
+        }
+
+        /* Custom Scrollbar for Phone Container */
+        .custom-scroll::-webkit-scrollbar {
+            width: 4px;
+        }
+        .custom-scroll::-webkit-scrollbar-thumb {
+            background: #D4AF37;
+            border-radius: 4px;
+        }
+
+        /* Card Shimmer */
+        .shimmer {
+            background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.4) 50%, rgba(255,255,255,0) 100%);
+            background-size: 200% 100%;
+            animation: shimmer 2.5s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+
+        @import url('https://googleapis.com');
+
+        .wedding-card-container {
+            position: relative;
+            width: 100%;
+            max-width: 500px;
+            aspect-ratio: 16 / 10;
+            background-color: #FFFDF9;
+            border: 1px solid rgba(120, 113, 108, 0.2);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            border-radius: 2px;
+            padding: 2rem;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            text-align: center;
+            box-sizing: border-between;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        .top-gradient-bar {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 6px;
+            background: linear-gradient(to right, #dc2626, #fb923c, #dc2626);
+            z-index: 20;
+        }
+
+        .petal-layer {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .petal {
+            position: absolute;
+            border-radius: 0 100% 0 100%;
+            opacity: 0.8;
+            filter: blur(0.2px);
+        }
+
+        /* Leaf/Petal Colors extracted from screen palette */
+        .petal-orange { background-color: #fb923c; }
+        .petal-yellow { background-color: #eab308; }
+        .petal-amber { background-color: #f59e0b; }
+        .petal-red { background-color: #f87171; }
+        .petal-pink { background-color: #f472b6; }
+        .petal-pink-light { background-color: #fbcfe8; }
+        .petal-yellow-dark { background-color: #ca8a04; }
+
+        .card-header-wrapper {
+            position: relative;
+            z-index: 10;
+            margin-top: 0.5rem;
+        }
+
+        .invitation-title {
+            font-family: 'Cinzel', serif;
+            font-size: 16px;
+            tracking: 0.22em;
+            letter-spacing: 0.22em;
+            color: #44403c;
+            font-weight: 500;
+            text-transform: uppercase;
+            margin: 0;
+        }
+
+        .names-wrapper {
+            position: relative;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin-top: auto;
+            margin-bottom: auto;
+            padding: 0.5rem 0;
+        }
+
+        .couple-name {
+            font-family: 'Great Vibes', cursive;
+            font-size: 56px;
+            line-height: 1;
+            margin: 0;
+            filter: drop-shadow(0px 1px 1px rgba(0,0,0,0.05));
+        }
+        
+        .text-maroon { color: #991b1b; }
+        .text-gold { color: #d97706; }
+
+        .ampersand {
+            font-family: 'Great Vibes', cursive;
+            font-size: 34px;
+            line-height: 1;
+            margin: 0.25rem 0;
+        }
+
+        .card-footer-parents {
+            position: relative;
+            z-index: 10;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 1rem;
+            margin-bottom: 0.5rem;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 11px;
+            letter-spacing: 0.05em;
+            color: #57534e;
+            font-weight: 400;
+            box-sizing: border-box;
+        }
+
+        .parent-line-left {
+            width: 50%;
+            text-align: right;
+            padding-right: 1rem;
+            border-right: 1px solid rgba(212, 204, 195, 0.8);
+        }
+
+        .parent-line-right {
+            width: 50%;
+            text-align: left;
+            padding-left: 1rem;
+        }
+
+        /* Clean responsive downscaling rules */
+        @media (max-width: 480px) {
+            .invitation-title { font-size: 13px; letter-spacing: 0.18em; }
+            .couple-name { font-size: 46px; }
+            .ampersand { font-size: 28px; }
+            .card-footer-parents { font-size: 9.5px; }
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center min-h-screen bg-stone-950 p-0 sm:p-4 md:p-6 overflow-hidden">
+
+    <canvas id="petalCanvas"></canvas>
+
+    <!-- MAIN MOBILE SIMULATOR WRAPPER -->
+    <div class="relative w-full max-w-[440px] h-[100vh] sm:h-[900px] sm:max-h-[95vh] bg-[#FFFDF7] sm:rounded-[36px] shadow-[0_0_50px_rgba(212,175,55,0.25)] border-0 sm:border-[8px] border-amber-900/60 overflow-hidden flex flex-col justify-between">
+        
+        <!-- AUDIO SOUNDTRACK TOGGLE BUTTON -->
+        <button id="musicToggleBtn" onclick="toggleAudio()" class="absolute top-4 right-4 z-30 w-10 h-10 rounded-full bg-amber-900/80 backdrop-blur-md text-amber-200 border border-amber-400/50 flex items-center justify-center shadow-lg active:scale-95 transition-all">
+            <i id="musicIcon" class="fas fa-music text-sm"></i>
+        </button>
+
+        <!-- COVER / DOOR ENTRANCE SECTION -->
+        <div id="doorOverlay" class="absolute inset-0 z-50 flex items-center justify-center bg-stone-950 door-container">
+            <!-- Left Door -->
+            <div id="leftDoor" class="door-left absolute left-0 top-0 w-1/2 h-full bg-[#520912] border-r-2 border-amber-400/60 flex flex-col justify-between p-4 shadow-2xl overflow-hidden">
+                <div class="w-full flex justify-center pt-6 opacity-60">
+                    <div class="w-16 h-16 border border-amber-400/40 rounded-full flex items-center justify-center">
+                        <i class="fas fa-om text-amber-300 text-2xl"></i>
+                    </div>
+                </div>
+                <!-- Toran Hanging Garland Graphic -->
+                <div class="absolute top-0 left-0 right-0 h-16 bg-[radial-gradient(circle_at_bottom,#d4af37_2px,transparent_3px)] bg-[length:16px_16px] opacity-40"></div>
+                <div class="text-right pr-2">
+                    <span class="text-amber-300/30 font-serif-title text-8xl font-bold">S</span>
+                </div>
+                <div class="pb-10"></div>
+            </div>
+
+            <!-- Right Door -->
+            <div id="rightDoor" class="door-right absolute right-0 top-0 w-1/2 h-full bg-[#520912] border-l-2 border-amber-400/60 flex flex-col justify-between p-4 shadow-2xl overflow-hidden">
+                <div class="w-full flex justify-center pt-6 opacity-60">
+                    <div class="w-16 h-16 border border-amber-400/40 rounded-full flex items-center justify-center">
+                        <i class="fas fa-dharmachakra text-amber-300 text-2xl"></i>
+                    </div>
+                </div>
+                <div class="text-left pl-2">
+                    <span class="text-amber-300/30 font-serif-title text-8xl font-bold">S</span>
+                </div>
+                <div class="pb-10"></div>
+            </div>
+
+            <!-- Central Seal & Trigger -->
+            <div id="centerSeal" class="relative z-10 flex flex-col items-center cursor-pointer group transition-transform duration-300 hover:scale-105" onclick="openDoor()">
+                <div class="w-28 h-28 rounded-full bg-gradient-to-tr from-amber-700 via-amber-500 to-yellow-200 p-1 shadow-[0_0_30px_rgba(212,175,55,0.8)] pulse-gold">
+                    <div class="w-full h-full rounded-full bg-[#520912] border-2 border-amber-300/80 flex flex-col items-center justify-center text-center p-2">
+                        <span class="font-serif-title text-2xl font-bold gold-gradient-text tracking-widest">S & S</span>
+                        <div class="w-8 h-[1px] bg-amber-400/50 my-0.5"></div>
+                        <i class="fas fa-heart text-xs text-rose-400"></i>
+                    </div>
+                </div>
+                <div class="mt-6 bg-stone-900/90 backdrop-blur-md px-5 py-2 rounded-full border border-amber-400/60 text-amber-200 font-serif-title text-xs tracking-widest uppercase flex items-center gap-2 shadow-xl group-hover:bg-amber-900">
+                    <span>✦ Tap to Open ✦</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- MAIN SCROLLABLE INVITATION CONTENT -->
+        <div id="mainContent" class="w-full h-full overflow-y-auto custom-scroll bg-[#FFFDF7] relative text-stone-800">
+            
+            <!-- TOP HERO SECTION -->
+            <div class="relative pt-12 pb-8 px-6 text-center bg-gradient-to-b from-amber-100/60 via-[#FFFDF7] to-[#FFFDF7] border-b border-amber-200/50 overflow-hidden">
+                <!-- Floral Garland Top Decoration -->
+                <div class="flex justify-center gap-2 mb-3 text-amber-600/80">
+                    <i class="fas fa-leaf text-xs"></i>
+                    <i class="fas fa-om text-lg text-amber-700"></i>
+                    <i class="fas fa-leaf font-flip-x text-xs"></i>
+                </div>
+
+                <p class="font-serif-title text-xs tracking-[0.25em] text-amber-900/70 font-semibold uppercase mb-2">Together with their families</p>
+                <p class="text-xs text-amber-800/80 italic mb-4">Request the honor of your presence</p>
+
+                <!-- BRIDE & GROOM MAIN NAMES -->
+                <div class="my-4">
+                    <h1 class="font-serif-title text-4xl text-[#6B0F1A] font-bold tracking-wide">Sneha</h1>
+                    <p class="text-xs text-stone-500 font-medium my-1">Daughter of Sangeetha & Manikandan</p>
+                    <p class="font-cursive text-3xl text-amber-600 font-bold my-1">&</p>
+                    <h1 class="font-serif-title text-4xl text-[#6B0F1A] font-bold tracking-wide">Saran</h1>
+                    <p class="text-xs text-stone-500 font-medium my-1">Son of Geetha & Periyasamy</p>
+                </div>
+
+                <!-- MAIN WEDDING TIME & VENUE HIGHLIGHT -->
+                <div class="mt-6 p-4 rounded-2xl bg-amber-50/80 border border-amber-200/80 shadow-sm max-w-xs mx-auto">
+                    <p class="text-xs font-serif-title tracking-wider text-amber-900 uppercase font-bold">at their wedding celebration</p>
+                    <p class="text-sm font-bold text-stone-800 mt-1">From 6:30 AM onwards</p>
+                    <p class="text-sm font-semibold text-amber-800">Monday, 16 November 2026</p>
+                    <p class="text-xs text-stone-600 mt-1"><i class="fas fa-map-marker-alt text-rose-600 mr-1"></i> Venue: Kongu Mini Marriage hall, Ammampalayam, Attur, Salem</p>
+                </div>
+
+                <!-- MAIN CARD IMAGE ARTWORK -->
+                <div class="mt-6 relative rounded-2xl overflow-hidden border-2 border-amber-300 shadow-md">
+                    <img src="invitation-image.jpg" alt="Sneha and Saran" class="w-full object-cover">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent flex items-end justify-center p-3">
+                        <span class="text-amber-200 font-serif-title text-xs tracking-widest uppercase bg-stone-900/80 px-4 py-1 rounded-full border border-amber-400/40">✦ See All Celebrations Below ✦</span>
+                    </div>
+                </div>
+
+                <div class="wedding-card-container">
+                    <!-- TOP ACCENT BAR -->
+                    <div class="top-gradient-bar"></div>
+                    <!-- INVITATION HEADER TEXT -->
+                    <div class="card-header-wrapper">
+                        <h3 class="invitation-title">You Are Warmly Invited</h3>
+                    </div>
+
+                    <!-- MAIN COUPLE NAMES SECTION -->
+                    <div class="names-wrapper">
+                        <h1 class="couple-name text-maroon">Sneha</h1>
+                        <span class="ampersand text-gold">&</span>
+                        <h1 class="couple-name text-maroon">Saran</h1>
+                    </div>
+
+                    <!-- PARENTS FOOTER SECTION -->
+                    <div class="card-footer-parents">
+                        <div class="parent-line-left">D/o Sangeetha & Manikandan</div>
+                        <div class="parent-line-right">S/o Geetha & Periyasamy</div>
+                    </div>
+                </div>
+
+                <!-- SUMMARY BADGES -->
+                <div class="mt-6 flex justify-around items-center text-center py-3 bg-white rounded-xl border border-amber-200 shadow-sm text-xs">
+                    <div class="px-2">
+                        <span class="block text-[10px] text-stone-400 font-bold uppercase tracking-widest">WHEN</span>
+                        <span class="font-bold text-amber-900">16 Nov 2026</span>
+                    </div>
+                    <div class="h-6 w-[1px] bg-amber-200"></div>
+                    <div class="px-2">
+                        <span class="block text-[10px] text-stone-400 font-bold uppercase tracking-widest">WHERE</span>
+                        <span class="font-bold text-amber-900">Kongu Mini Marriage hall, Ammampalayam, Attur, Salem</span>
+                    </div>
+                </div>
+
+                <p class="mt-4 text-xs font-bold text-amber-800 tracking-wider">#SNEHAWEDSSARAN</p>
+            </div>
+
+            <!-- FESTIVITIES / TIMELINE SECTION -->
+            <div class="p-6 bg-[#FFFDF7]">
+                <div class="text-center mb-6">
+                    <span class="text-[10px] font-serif-title font-bold tracking-[0.3em] text-amber-700 uppercase">Two Days of Celebration</span>
+                    <h2 class="font-serif-title text-2xl text-[#6B0F1A] font-bold mt-1">The Festivities</h2>
+                    <div class="w-12 h-[2px] bg-amber-400 mx-auto mt-2"></div>
+                </div>
+
+                <!-- EVENT 1: ENGAGEMENT -->
+                <div class="mb-6 bg-white rounded-2xl p-4 border border-amber-200 shadow-md relative overflow-hidden">
+                    <div class="absolute top-0 right-0 w-20 h-20 bg-amber-100 rounded-bl-full opacity-50 -z-0"></div>
+                    <div class="relative z-10">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <span class="text-[10px] font-bold uppercase text-amber-600 tracking-wider">Sunday, 15 November 2026</span>
+                                <h3 class="font-serif-title text-xl font-bold text-[#6B0F1A]">Engagement</h3>
+                                <p class="text-xs text-stone-500 italic">Nichayathartham</p>
+                            </div>
+                            <button onclick="openEngagementModal()" class="px-3 py-1.5 rounded-full bg-amber-400 text-stone-900 font-bold text-[10px] uppercase tracking-wider shadow hover:bg-amber-300 transition-all flex items-center gap-1 pulse-gold">
+                                <i class="fas fa-hand-sparkles"></i> Rub to Reveal
+                            </button>
+                        </div>
+                        <p class="text-xs font-semibold text-stone-700 mt-2"><i class="far fa-clock text-amber-600 mr-1"></i> 6:00 PM onwards · Reddiyar Marriage Hall, Thalaivasal, Salem</p>
+                        <p class="text-xs text-stone-500 mt-1 italic">"Laughter and the very first blessings."</p>
+                        
+                        <a href="https://calendar.google.com" target="_blank" class="mt-3 inline-block px-3 py-1 rounded-full border border-amber-400 text-amber-800 text-[10px] font-bold hover:bg-amber-50">
+                            + ADD TO CALENDAR
+                        </a>
+                    </div>
+                </div>
+
+                <!-- EVENT 2: PEN ALAIPPU -->
+                <div class="mb-6 bg-white rounded-2xl p-4 border border-amber-200 shadow-md relative overflow-hidden">
+                    <div class="absolute top-0 right-0 w-20 h-20 bg-rose-100 rounded-bl-full opacity-50 -z-0"></div>
+                    <div class="relative z-10">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <span class="text-[10px] font-bold uppercase text-amber-600 tracking-wider">Sunday, 15 November 2026</span>
+                                <h3 class="font-serif-title text-xl font-bold text-[#6B0F1A]">Bridal welcoming ceremony</h3>
+                                <p class="text-xs text-stone-500 italic">Pen Alaippu</p>
+                            </div>
+                            <button onclick="openPenAlaippuModal()" class="px-3 py-1.5 rounded-full bg-rose-500 text-white font-bold text-[10px] uppercase tracking-wider shadow hover:bg-rose-600 transition-all flex items-center gap-1">
+                                <i class="fas fa-heart"></i> Trace Heart
+                            </button>
+                        </div>
+                        <p class="text-xs font-semibold text-stone-700 mt-2"><i class="far fa-clock text-amber-600 mr-1"></i> 8:30 PM onwards · Reddiyar Marriage Hall, Thalaivasal, Salem</p>
+                        <p class="text-xs text-stone-500 mt-1 italic">"The deeper the love."</p>
+                        
+                        <a href="https://calendar.google.com" target="_blank" class="mt-3 inline-block px-3 py-1 rounded-full border border-amber-400 text-amber-800 text-[10px] font-bold hover:bg-amber-50">
+                            + ADD TO CALENDAR
+                        </a>
+                    </div>
+                </div>
+
+                <!-- EVENT 3: THE WEDDING -->
+                <div class="mb-6 bg-white rounded-2xl p-4 border border-amber-200 shadow-md relative overflow-hidden">
+                    <div class="absolute top-0 right-0 w-20 h-20 bg-purple-100 rounded-bl-full opacity-50 -z-0"></div>
+                    <div class="relative z-10">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <span class="text-[10px] font-bold uppercase text-amber-600 tracking-wider">Monday, 16 November 2026</span>
+                                <h3 class="font-serif-title text-xl font-bold text-[#6B0F1A]">The Wedding</h3>
+                                <p class="text-xs text-stone-500 italic">The Muhurtham</p>
+                            </div>
+                            <button onclick="openWeddingModal()" class="px-3 py-1.5 rounded-full bg-amber-600 text-white font-bold text-[10px] uppercase tracking-wider shadow hover:bg-amber-700 transition-all flex items-center gap-1">
+                                <i class="fas fa-drum"></i> Tap the Dhol
+                            </button>
+                        </div>
+                        <p class="text-xs font-semibold text-stone-700 mt-2"><i class="far fa-clock text-amber-600 mr-1"></i> 6:00 - 7:00 AM · Sri Kamanatha Eswarar Temple, Aragalur</p>
+                        <p class="text-xs text-stone-500 mt-1 italic">"Music and the whole family on its feet."</p>
+                        
+                        <a href="https://calendar.google.com" target="_blank" class="mt-3 inline-block px-3 py-1 rounded-full border border-amber-400 text-amber-800 text-[10px] font-bold hover:bg-amber-50">
+                            + ADD TO CALENDAR
+                        </a>
+                    </div>
+                </div>
+
+                <!-- EVENT 4: THE RECEPTION -->
+                <div class="mb-6 bg-white rounded-2xl p-4 border border-amber-200 shadow-md relative overflow-hidden">
+                    <div class="relative z-10">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <span class="text-[10px] font-bold uppercase text-amber-600 tracking-wider">Monday, 16 November 2026</span>
+                                <h3 class="font-serif-title text-xl font-bold text-[#6B0F1A]">The Reception</h3>
+                                <p class="text-xs text-stone-500 italic">The Celebration</p>
+                            </div>
+                            <button onclick="openReceptionModal()" class="px-3 py-1.5 rounded-full bg-green-600 text-white font-bold text-[10px] uppercase tracking-wider shadow hover:bg-green-700 transition-all flex items-center gap-1">
+                                <i class="fas fa-drum"></i> Tap the Dhol
+                            </button>
+                        </div>
+                        <p class="text-xs font-semibold text-stone-700 mt-2"><i class="far fa-clock text-amber-600 mr-1"></i> 11 AM onwards · Kongu Mini Marriage hall, Ammampalayam, Attur, Salem</p>
+                        <p class="text-xs text-stone-500 mt-1 italic">"The sacred vows — with your blessings."</p>
+                        
+                        <a href="https://calendar.google.com" target="_blank" class="mt-3 inline-block px-3 py-1 rounded-full border border-amber-400 text-amber-800 text-[10px] font-bold hover:bg-amber-50">
+                            + ADD TO CALENDAR
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TEAM SELECTION (PICK YOUR SIDE) SECTION -->
+            <div class="p-6 bg-amber-50/50 border-t border-b border-amber-200 text-center">
+                <span class="text-[10px] font-serif-title font-bold tracking-widest text-amber-700 uppercase">A Little Friendly Rivalry</span>
+                <h3 class="font-serif-title text-xl font-bold text-[#6B0F1A] mt-1">Pick your side</h3>
+                <p class="text-xs text-stone-500 mt-1 max-w-xs mx-auto">Whose side are you cheering for? Tap to join — your pick rides along with your RSVP.</p>
+
+                <div class="grid grid-cols-2 gap-4 mt-6">
+                    <!-- Team Bride -->
+                    <div id="cardTeamBride" onclick="selectTeam('bride')" class="cursor-pointer p-4 rounded-2xl bg-white border-2 border-stone-200 hover:border-pink-400 transition-all shadow-sm relative flex flex-col items-center">
+                        <div id="badgeBride" class="hidden absolute top-2 right-2 bg-pink-500 text-white text-[9px] px-2 py-0.5 rounded-full font-bold">✓ YOU'RE IN</div>
+                        <div class="w-12 h-12 rounded-full bg-pink-100 text-pink-600 flex items-center justify-center text-xl mb-2">
+                            <i class="fas fa-crown"></i>
+                        </div>
+                        <span class="text-xs font-bold text-stone-700">Team Bride</span>
+                        <span class="font-serif-title text-base font-bold text-[#6B0F1A]">Sneha</span>
+                    </div>
+
+                    <!-- Team Groom -->
+                    <div id="cardTeamGroom" onclick="selectTeam('groom')" class="cursor-pointer p-4 rounded-2xl bg-white border-2 border-stone-200 hover:border-amber-400 transition-all shadow-sm relative flex flex-col items-center">
+                        <div id="badgeGroom" class="hidden absolute top-2 right-2 bg-amber-500 text-white text-[9px] px-2 py-0.5 rounded-full font-bold">✓ YOU'RE IN</div>
+                        <div class="w-12 h-12 rounded-full bg-amber-100 text-amber-700 flex items-center justify-center text-xl mb-2">
+                            <i class="fas fa-crown"></i>
+                        </div>
+                        <span class="text-xs font-bold text-stone-700">Team Groom</span>
+                        <span class="font-serif-title text-base font-bold text-[#6B0F1A]">Saran</span>
+                    </div>
+                </div>
+
+                <p id="teamSelectionStatus" class="text-xs text-amber-800 font-bold mt-4 h-4"></p>
+            </div>
+
+            <!-- COUNTDOWN TIMER SECTION -->
+            <div class="p-6 bg-[#4A0810] text-amber-100 text-center relative overflow-hidden">
+                <div class="relative z-10">
+                    <span class="text-[10px] font-serif-title tracking-[0.2em] uppercase text-amber-300/80 font-semibold">Counting down to the Muhurtham</span>
+                    
+                    <div class="grid grid-cols-4 gap-2 mt-4 max-w-xs mx-auto">
+                        <div class="bg-stone-900/60 backdrop-blur p-2 rounded-xl border border-amber-400/30">
+                            <span id="timerDays" class="block font-serif-title text-2xl font-bold text-amber-200">170</span>
+                            <span class="text-[9px] uppercase tracking-wider text-amber-300/70">Days</span>
+                        </div>
+                        <div class="bg-stone-900/60 backdrop-blur p-2 rounded-xl border border-amber-400/30">
+                            <span id="timerHours" class="block font-serif-title text-2xl font-bold text-amber-200">04</span>
+                            <span class="text-[9px] uppercase tracking-wider text-amber-300/70">Hours</span>
+                        </div>
+                        <div class="bg-stone-900/60 backdrop-blur p-2 rounded-xl border border-amber-400/30">
+                            <span id="timerMins" class="block font-serif-title text-2xl font-bold text-amber-200">33</span>
+                            <span class="text-[9px] uppercase tracking-wider text-amber-300/70">Mins</span>
+                        </div>
+                        <div class="bg-stone-900/60 backdrop-blur p-2 rounded-xl border border-amber-400/30">
+                            <span id="timerSecs" class="block font-serif-title text-2xl font-bold text-amber-200">23</span>
+                            <span class="text-[9px] uppercase tracking-wider text-amber-300/70">Secs</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- RSVP FORM SECTION -->
+            <div class="p-6 bg-white">
+                <div class="text-center mb-6">
+                    <h3 class="font-serif-title text-2xl font-bold text-[#6B0F1A]">Will you join us?</h3>
+                    <p class="text-xs text-stone-500 mt-1">Kindly reply by 15 November 2026.<br>Your response opens straight in WhatsApp.</p>
+                </div>
+
+                <form id="rsvpForm" onsubmit="handleRSVPSubmit(event)" class="space-y-4 max-w-xs mx-auto text-left">
+                    <!-- Guest Name Input -->
+                    <div>
+                        <label class="block text-[10px] font-bold text-stone-500 uppercase tracking-wider mb-1">Your Name</label>
+                        <input type="text" id="rsvpName" required placeholder="e.g. Lakshmi" class="w-full px-3 py-2.5 rounded-xl border border-stone-300 text-sm focus:outline-none focus:border-amber-500">
+                    </div>
+
+                    <!-- Attendance Option -->
+                    <div>
+                        <label class="block text-[10px] font-bold text-stone-500 uppercase tracking-wider mb-1">Will you attend?</label>
+                        <div class="grid grid-cols-2 gap-2">
+                            <button type="button" id="btnAttendYes" onclick="setAttendance(true)" class="py-2.5 rounded-xl border border-amber-500 bg-amber-50 text-amber-900 font-bold text-xs flex items-center justify-center gap-1">
+                                <i class="fas fa-check-circle"></i> Joyfully yes
+                            </button>
+                            <button type="button" id="btnAttendNo" onclick="setAttendance(false)" class="py-2.5 rounded-xl border border-stone-200 text-stone-500 font-bold text-xs flex items-center justify-center gap-1">
+                                Regretfully no
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Which Celebrations (Multi-select) -->
+                    <div>
+                        <label class="block text-[10px] font-bold text-stone-500 uppercase tracking-wider mb-1">Which celebrations? (tap all that apply)</label>
+                        <div class="grid grid-cols-2 gap-2">
+                            <button type="button" onclick="toggleCelebration(this, 'Engagement')" class="celeb-pill px-3 py-2 rounded-xl border border-amber-400 bg-amber-100 text-amber-900 font-bold text-xs text-center">Engagement</button>
+                            <button type="button" onclick="toggleCelebration(this, 'Bridal Welcoming Ceremony')" class="celeb-pill px-3 py-2 rounded-xl border border-amber-400 bg-amber-100 text-amber-900 font-bold text-xs text-center">Bridal Welcoming Ceremony</button>
+                            <button type="button" onclick="toggleCelebration(this, 'The Wedding')" class="celeb-pill px-3 py-2 rounded-xl border border-amber-400 bg-amber-100 text-amber-900 font-bold text-xs text-center">The Wedding</button>
+                            <button type="button" onclick="toggleCelebration(this, 'The Reception')" class="celeb-pill px-3 py-2 rounded-xl border border-amber-400 bg-amber-100 text-amber-900 font-bold text-xs text-center">The Reception</button>
+                        </div>
+                    </div>
+
+                    <!-- Number of Guests -->
+                    <div>
+                        <label class="block text-[10px] font-bold text-stone-500 uppercase tracking-wider mb-1">Number of Guests</label>
+                        <input type="number" id="rsvpGuests" min="1" max="10" value="1" class="w-full px-3 py-2.5 rounded-xl border border-stone-300 text-sm focus:outline-none focus:border-amber-500">
+                    </div>
+
+                    <!-- WhatsApp RSVP Button -->
+                    <button type="submit" class="w-full py-3.5 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm shadow-lg flex items-center justify-center gap-2 transition-all">
+                        <i class="fab fa-whatsapp text-lg"></i>
+                        <span>SEND RSVP ON WHATSAPP</span>
+                    </button>
+                </form>
+            </div>
+
+            <!-- FOOTER -->
+            <div class="p-8 bg-[#120205] text-amber-200/80 text-center text-xs space-y-2 border-t border-amber-900/50">
+                <i class="fas fa-om text-2xl text-amber-400"></i>
+                <p class="italic text-stone-300">With the blessings of our elders<br>and the warmth of your presence.</p>
+                <p class="font-serif-title text-base font-bold text-amber-300">Sneha & Saran</p>
+                <p class="text-[10px] text-amber-500/60 uppercase tracking-widest pt-2">Made with Love</p>
+            </div>
+        </div>
+
+        <!-- ================= MODALS & INTERACTIVE OVERLAYS ================= -->
+
+        <!-- MODAL 1: HALDI SCRATCH CARD -->
+        <div id="engagementModal" class="hidden absolute inset-0 z-50 bg-stone-950/90 backdrop-blur-md flex items-center justify-center p-4">
+            <div class="modal-enter w-full max-w-xs bg-amber-50 rounded-3xl p-5 border-2 border-amber-400 shadow-2xl relative text-center">
+                <button onclick="closeModal('engagementModal')" class="absolute top-3 right-3 w-8 h-8 rounded-full bg-stone-200 text-stone-700 font-bold text-sm flex items-center justify-center">✕</button>
+
+                <div class="flex justify-between items-center mb-3 pr-8">
+                    <span class="text-[10px] font-bold text-amber-800 uppercase tracking-widest">Interactive Reveal</span>
+                    <button onclick="forceRevealEngagement()" class="px-2.5 py-1 bg-amber-200 text-amber-900 rounded-lg text-[10px] font-bold">REVEAL ></button>
+                </div>
+
+                <!-- Canvas Container for Rub-off Turmeric -->
+                <div class="relative w-full h-72 rounded-2xl overflow-hidden border-2 border-amber-300 shadow-inner">
+                    <!-- Revealed Card Artwork Underneath -->
+                    <div class="absolute inset-0 bg-amber-100 p-4 flex flex-col justify-between items-center text-amber-950 bg-cover bg-center" style="background-image: url('https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&w=600&q=80');">
+                        <div class="bg-white/95 backdrop-blur p-3 rounded-xl border border-amber-300 text-center w-full shadow-lg">
+                            <p class="text-[10px] font-bold text-amber-800 uppercase">Join us to celebrate our</p>
+                            <h3 class="font-serif-title text-xl font-bold text-[#6B0F1A]">Engagement Ceremony</h3>
+                            <p class="text-[11px] text-stone-600 font-medium">Nichayathartham</p>
+                            <div class="mt-2 text-xs font-bold text-amber-900 border-t border-amber-200 pt-1">
+                                At 6:00 PM · 15th Nov 2026<br>
+                                Venue: Reddiyar Marriage Hall, Thalaivasal, Salem
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Scratchable Overlay Canvas -->
+                    <canvas id="engagementScratchCanvas" class="absolute inset-0 w-full h-full cursor-pointer z-10"></canvas>
+                </div>
+
+                <p class="text-xs font-bold text-amber-900 mt-3 flex items-center justify-center gap-1">
+                    <i class="fas fa-hand-pointer text-amber-600"></i> RUB OFF THE TURMERIC
+                </p>
+            </div>
+        </div>
+
+        <!-- MODAL 2: MEHNDI HEART TRACE -->
+        <div id="penAlaippuModal" class="hidden absolute inset-0 z-50 bg-stone-950/90 backdrop-blur-md flex items-center justify-center p-4">
+            <div class="modal-enter w-full max-w-xs bg-rose-50 rounded-3xl p-5 border-2 border-rose-400 shadow-2xl relative text-center">
+                <button onclick="closeModal('penAlaippuModal')" class="absolute top-3 right-3 w-8 h-8 rounded-full bg-stone-200 text-stone-700 font-bold text-sm flex items-center justify-center">✕</button>
+
+                <div class="flex justify-between items-center mb-3 pr-8">
+                    <span class="text-[10px] font-bold text-rose-800 uppercase tracking-widest">Interactive Trace</span>
+                    <button onclick="forceRevealPenAlaippu()" class="px-2.5 py-1 bg-rose-200 text-rose-900 rounded-lg text-[10px] font-bold">REVEAL ></button>
+                </div>
+
+                <div class="relative w-full h-72 rounded-2xl overflow-hidden border-2 border-rose-300 bg-rose-100 flex items-center justify-center">
+                    <!-- Revealed Henna Content -->
+                    <div id="penAlaippuCardContent" class="hidden inset-0 p-4 flex flex-col justify-between items-center text-stone-800 bg-cover bg-center w-full h-full" style="background-image: url('https://images.unsplash.com/photo-1595981267035-7b04ca84a82d?auto=format&fit=crop&w=600&q=80');">
+                        <div class="bg-white/95 backdrop-blur p-3 rounded-xl border border-rose-300 text-center w-full shadow-lg">
+                            <p class="text-[10px] text-rose-800 font-bold uppercase">Where henna meets hearts, our journey begins...</p>`
+                            <h3 class="font-serif-title text-xl font-bold text-[#6B0F1A] my-1">Bridal Welcoming Ceremony</h3>
+                            <p class="text-xs text-stone-700">Sunday, 15th Nov 2026 | 8:30 PM</p>
+                            <p class="text-[11px] text-stone-600">Venue: Reddiyar Marriage Hall, Thalaivasal, Salem</p>
+                        </div>
+                    </div>
+
+                    <!-- Heart Tracing Path Canvas overlay -->
+                    <canvas id="penAlaippuCanvas" class="absolute inset-0 w-full h-full cursor-pointer z-10"></canvas>
+                </div>
+
+                <p id="penAlaippuStatusText" class="text-xs font-bold text-rose-900 mt-3 flex items-center justify-center gap-1">
+                    <i class="fas fa-heart text-rose-500"></i> TRACE THE HEART WITH HENNA
+                </p>
+            </div>
+        </div>
+
+        <!-- MODAL 3: Wedding DHOL TAP -->
+        <div id="weddingModal" class="hidden absolute inset-0 z-50 bg-stone-950/90 backdrop-blur-md flex items-center justify-center p-4">
+            <div class="modal-enter w-full max-w-xs bg-amber-950 rounded-3xl p-5 border-2 border-amber-400 shadow-2xl relative text-center text-amber-100">
+                <button onclick="closeModal('weddingModal')" class="absolute top-3 right-3 w-8 h-8 rounded-full bg-amber-900 text-amber-200 font-bold text-sm flex items-center justify-center">✕</button>
+
+                <div class="flex justify-between items-center mb-3 pr-8">
+                    <span class="text-[10px] font-bold text-amber-400 uppercase tracking-widest">Interactive Music</span>
+                    <button onclick="forceRevealWedding()" class="px-2.5 py-1 bg-amber-800 text-amber-200 rounded-lg text-[10px] font-bold">REVEAL ></button>
+                </div>
+
+                <div class="relative w-full h-72 rounded-2xl overflow-hidden border border-amber-500/50 bg-gradient-to-b from-amber-900 to-amber-950 flex flex-col items-center justify-center p-4">
+                    <!-- Revealed Sangeet Content -->
+                    <div id="weddingCardContent" class="hidden w-full h-full flex-col justify-center items-center bg-cover bg-center p-4 rounded-xl text-center" style="background-image: url('https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?auto=format&fit=crop&w=600&q=80');">
+                        <div class="bg-black/80 backdrop-blur p-3 rounded-xl border border-amber-400/60">
+                            <p class="text-[10px] text-amber-300 font-bold uppercase">Join us to celebrate our</p>
+                            <h3 class="font-serif-title text-xl font-bold text-amber-200">The Wedding Ceremony</h3>
+                            <p class="text-xs text-amber-100 mt-1">At 6:00 AM · 16th Nov 2026</p>
+                            <p class="text-[10px] text-amber-300/80 mt-1">Venue: Kongu Mini Marriage hall, Ammampalayam, Attur, Salem</p>
+                        </div>
+                    </div>
+
+                    <!-- Dhol Instrument Graphic -->
+                    <div id="dholGraphic" onclick="tapDhol()" class="cursor-pointer transition-transform duration-100 text-center">
+                        <div class="w-32 h-32 rounded-full bg-amber-700/40 border-4 border-amber-400 flex items-center justify-center mx-auto shadow-[0_0_25px_rgba(212,175,55,0.5)]">
+                            <i class="fas fa-drum text-6xl text-amber-300"></i>
+                        </div>
+                        <p class="text-sm font-bold text-amber-300 mt-3 font-serif-title">Tap the Dhol</p>
+                        <div class="flex justify-center gap-1 mt-2" id="dholDots">
+                            <span class="w-2.5 h-2.5 rounded-full bg-amber-800"></span>
+                            <span class="w-2.5 h-2.5 rounded-full bg-amber-800"></span>
+                            <span class="w-2.5 h-2.5 rounded-full bg-amber-800"></span>
+                            <span class="w-2.5 h-2.5 rounded-full bg-amber-800"></span>
+                            <span class="w-2.5 h-2.5 rounded-full bg-amber-800"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <p id="dholStatusText" class="text-xs font-bold text-amber-300 mt-3">
+                    TAP THE DHOL TO THE BEAT (0/5)
+                </p>
+            </div>
+        </div>
+
+        <!-- MODAL 4: Reception DHOL TAP -->
+        <div id="ReceptionModal" class="hidden absolute inset-0 z-50 bg-stone-950/90 backdrop-blur-md flex items-center justify-center p-4">
+            <div class="modal-enter w-full max-w-xs bg-green-950 rounded-3xl p-5 border-2 border-green-400 shadow-2xl relative text-center text-green-100">
+                <button onclick="closeModal('ReceptionModal')" class="absolute top-3 right-3 w-8 h-8 rounded-full bg-green-900 text-green-200 font-bold text-sm flex items-center justify-center">✕</button>
+
+                <div class="flex justify-between items-center mb-3 pr-8">
+                    <span class="text-[10px] font-bold text-green-400 uppercase tracking-widest">Interactive Music</span>
+                    <button onclick="forceRevealReception()" class="px-2.5 py-1 bg-green-800 text-green-200 rounded-lg text-[10px] font-bold">REVEAL ></button>
+                </div>
+
+                <div class="relative w-full h-72 rounded-2xl overflow-hidden border border-green-500/50 bg-gradient-to-b from-green-900 to-green-950 flex flex-col items-center justify-center p-4">
+                    <!-- Revealed Sangeet Content -->
+                    <div id="receptionCardContent" class="hidden w-full h-full flex-col justify-center items-center bg-cover bg-center p-4 rounded-xl text-center" style="background-image: url('https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?auto=format&fit=crop&w=600&q=80');">
+                        <div class="bg-black/80 backdrop-blur p-3 rounded-xl border border-green-400/60">
+                            <p class="text-[10px] text-green-300 font-bold uppercase">Join us to celebrate our</p>
+                            <h3 class="font-serif-title text-xl font-bold text-green-200">The Reception Ceremony</h3>
+                            <p class="text-xs text-green-100 mt-1">At 11:00 AM · 16th Nov 2026</p>
+                            <p class="text-[10px] text-green-300/80 mt-1">Venue: Kongu Mini Marriage hall, Ammampalayam, Attur, Salem</p>
+                        </div>
+                    </div>
+
+                    <!-- Dhol Instrument Graphic -->
+                    <div id="dholReceptionGraphic" onclick="tapReceptionDhol()" class="cursor-pointer transition-transform duration-100 text-center">
+                        <div class="w-32 h-32 rounded-full bg-green-700/40 border-4 border-green-400 flex items-center justify-center mx-auto shadow-[0_0_25px_rgba(34,197,94,0.5)]">
+                            <i class="fas fa-drum text-6xl text-green-300"></i>
+                        </div>
+                        <p class="text-sm font-bold text-green-300 mt-3 font-serif-title">Tap the Dhol</p>
+                        <div class="flex justify-center gap-1 mt-2" id="dholReceptionDots">
+                            <span class="w-2.5 h-2.5 rounded-full bg-green-800"></span>
+                            <span class="w-2.5 h-2.5 rounded-full bg-green-800"></span>
+                            <span class="w-2.5 h-2.5 rounded-full bg-green-800"></span>
+                            <span class="w-2.5 h-2.5 rounded-full bg-green-800"></span>
+                            <span class="w-2.5 h-2.5 rounded-full bg-green-800"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <p id="dholReceptionStatusText" class="text-xs font-bold text-green-300 mt-3">
+                    TAP THE DHOL TO THE BEAT (0/5)
+                </p>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // ================= AUDIO SYNTHESIZER (WEB AUDIO API) =================
+        let audioCtx = null;
+        let isMuted = false;
+        let bgMusicTimer = null;
+
+        function initAudio() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+        }
+
+        function playSoundTone(freq, type, duration) {
+            if (isMuted) return;
+            initAudio();
+            try {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = type || 'sine';
+                osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+                gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start();
+                osc.stop(audioCtx.currentTime + duration);
+            } catch(e) {}
+        }
+
+        function playDholSound() {
+            if (isMuted) return;
+            initAudio();
+            // Low bass thud
+            playSoundTone(110, 'sine', 0.25);
+            // High snap
+            setTimeout(() => playSoundTone(320, 'triangle', 0.15), 50);
+        }
+
+        function toggleAudio() {
+            isMuted = !isMuted;
+            const btn = document.getElementById('musicToggleBtn');
+            const icon = document.getElementById('musicIcon');
+            if (isMuted) {
+                btn.classList.add('opacity-50');
+                icon.className = 'fas fa-volume-mute text-sm';
+            } else {
+                btn.classList.remove('opacity-50');
+                icon.className = 'fas fa-music text-sm';
+                playSoundTone(440, 'sine', 0.2);
+            }
+        }
+
+        // ================= DOOR OPEN ANIMATION =================
+        function openDoor() {
+            const doorOverlay = document.getElementById('doorOverlay');
+            playSoundTone(523.25, 'sine', 0.4); // C5 tone
+            setTimeout(() => playSoundTone(659.25, 'sine', 0.5), 150); // E5 tone
+            
+            doorOverlay.classList.add('doors-open');
+            setTimeout(() => {
+                doorOverlay.style.display = 'none';
+            }, 500);
+
+            // Fire confetti celebration on entrance
+            confetti({
+                particleCount: 50,
+                spread: 60,
+                origin: { y: 0.6 }
+            });
+        }
+
+        // ================= FLOATING PETALS CANVAS =================
+        const petalCanvas = document.getElementById('petalCanvas');
+        const ctxPetal = petalCanvas.getContext('2d');
+        let petals = [];
+
+        function resizePetalCanvas() {
+            petalCanvas.width = window.innerWidth;
+            petalCanvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizePetalCanvas);
+        resizePetalCanvas();
+
+        class Petal {
+            constructor() {
+                this.x = Math.random() * petalCanvas.width;
+                this.y = Math.random() * petalCanvas.height - petalCanvas.height;
+                this.size = Math.random() * 8 + 6;
+                this.speedY = Math.random() * 1.5 + 0.8;
+                this.speedX = Math.sin(this.y * 0.05) * 1;
+                this.rotation = Math.random() * 360;
+                this.rotationSpeed = Math.random() * 2 - 1;
+                this.color = Math.random() > 0.4 ? '#E85D75' : '#D4AF37';
+            }
+            update() {
+                this.y += this.speedY;
+                this.x += Math.sin(this.y * 0.02);
+                this.rotation += this.rotationSpeed;
+                if (this.y > petalCanvas.height) {
+                    this.y = -20;
+                    this.x = Math.random() * petalCanvas.width;
+                }
+            }
+            draw() {
+                ctxPetal.save();
+                ctxPetal.translate(this.x, this.y);
+                ctxPetal.rotate((this.rotation * Math.PI) / 180);
+                ctxPetal.fillStyle = this.color;
+                ctxPetal.globalAlpha = 0.6;
+                ctxPetal.beginPath();
+                ctxPetal.ellipse(0, 0, this.size, this.size / 2, 0, 0, Math.PI * 2);
+                ctxPetal.fill();
+                ctxPetal.restore();
+            }
+        }
+
+        for (let i = 0; i < 25; i++) {
+            petals.push(new Petal());
+        }
+
+        function animatePetals() {
+            ctxPetal.clearRect(0, 0, petalCanvas.width, petalCanvas.height);
+            petals.forEach(p => {
+                p.update();
+                p.draw();
+            });
+            requestAnimationFrame(animatePetals);
+        }
+        animatePetals();
+
+        // ================= MODAL MANAGERS =================
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.add('hidden');
+        }
+
+        // --- HALDI SCRATCH CARD INTERACTION ---
+        let isScratching = false;
+        function openEngagementModal() {
+            document.getElementById('engagementModal').classList.remove('hidden');
+            setupEngagementCanvas();
+        }
+
+        function setupEngagementCanvas() {
+            const canvas = document.getElementById('engagementScratchCanvas');
+            const c = canvas.getContext('2d');
+            canvas.width = canvas.offsetWidth;
+            canvas.height = canvas.offsetHeight;
+
+            // Fill yellow turmeric paste texture overlay
+            c.fillStyle = '#EAB308';
+            c.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Add text prompt on canvas
+            c.fillStyle = '#713F12';
+            c.font = 'bold 14px "Plus Jakarta Sans", sans-serif';
+            c.textAlign = 'center';
+            c.fillText('RUB HERE TO REMOVE TURMERIC', canvas.width / 2, canvas.height / 2);
+
+            function scratch(e) {
+                if (!isScratching) return;
+                const rect = canvas.getBoundingClientRect();
+                const x = (e.clientX || (e.touches && e.touches[0].clientX)) - rect.left;
+                const y = (e.clientY || (e.touches && e.touches[0].clientY)) - rect.top;
+
+                c.globalCompositeOperation = 'destination-out';
+                c.beginPath();
+                c.arc(x, y, 25, 0, Math.PI * 2);
+                c.fill();
+                playSoundTone(200, 'sine', 0.05);
+            }
+
+            canvas.onmousedown = canvas.ontouchstart = (e) => { isScratching = true; scratch(e); };
+            canvas.onmousemove = canvas.ontouchmove = scratch;
+            canvas.onmouseup = canvas.ontouchend = () => { isScratching = false; };
+        }
+
+        function forceRevealEngagement() {
+            const canvas = document.getElementById('engagementScratchCanvas');
+            const c = canvas.getContext('2d');
+            c.clearRect(0, 0, canvas.width, canvas.height);
+            confetti({ particleCount: 30, spread: 50 });
+        }
+
+        // --- MEHNDI HEART TRACING INTERACTION ---
+        function openPenAlaippuModal() {
+            document.getElementById('penAlaippuModal').classList.remove('hidden');
+            setupPenAlaippuCanvas();
+        }
+
+        function setupPenAlaippuCanvas() {
+            const canvas = document.getElementById('penAlaippuCanvas');
+            const c = canvas.getContext('2d');
+            canvas.width = canvas.offsetWidth;
+            canvas.height = canvas.offsetHeight;
+
+            c.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Draw dashed pen alaippu guide path
+            c.strokeStyle = '#F43F5E';
+            c.lineWidth = 4;
+            c.setLineDash([6, 6]);
+            drawPenAlaippuPath(c, canvas.width / 2, canvas.height / 2, 70);
+
+            let isTracing = false;
+            let tracedPoints = 0;
+
+            function trace(e) {
+                if (!isTracing) return;
+                const rect = canvas.getBoundingClientRect();
+                const x = (e.clientX || (e.touches && e.touches[0].clientX)) - rect.left;
+                const y = (e.clientY || (e.touches && e.touches[0].clientY)) - rect.top;
+
+                c.setLineDash([]);
+                c.fillStyle = '#881337';
+                c.beginPath();
+                c.arc(x, y, 8, 0, Math.PI * 2);
+                c.fill();
+
+                tracedPoints++;
+                if (tracedPoints > 25) {
+                    forceRevealPenAlaippu();
+                }
+            }
+
+            canvas.onmousedown = canvas.ontouchstart = (e) => { isTracing = true; trace(e); };
+            canvas.onmousemove = canvas.ontouchmove = trace;
+            canvas.onmouseup = canvas.ontouchend = () => { isTracing = false; };
+        }
+
+        function drawPenAlaippuPath(c, x, y, size) {
+            c.beginPath();
+            c.moveTo(x, y + size / 4);
+            c.quadraticCurveTo(x, y, x - size / 2, y);
+            c.quadraticCurveTo(x - size, y, x - size, y + size / 2);
+            c.quadraticCurveTo(x - size, y + size, x, y + size * 1.3);
+            c.quadraticCurveTo(x + size, y + size, x + size, y + size / 2);
+            c.quadraticCurveTo(x + size, y, x + size / 2, y);
+            c.quadraticCurveTo(x, y, x, y + size / 4);
+            c.stroke();
+        }
+
+        function forceRevealPenAlaippu() {
+            document.getElementById('penAlaippuCanvas').classList.add('hidden');
+            document.getElementById('penAlaippuCardContent').classList.remove('hidden');
+            document.getElementById('penAlaippuCardContent').classList.add('flex');
+            document.getElementById('penAlaippuStatusText').innerHTML = '✦ PEN ALAIPPU UNLOCKED! ✦';
+            confetti({ particleCount: 30, spread: 50 });
+        }
+
+        // --- SANGEET DHOL TAP INTERACTION ---
+        let dholTapCount = 0;
+        function openWeddingModal() {
+            dholTapCount = 0;
+            document.getElementById('weddingModal').classList.remove('hidden');
+            document.getElementById('weddingCardContent').classList.add('hidden');
+            document.getElementById('weddingCardContent').classList.remove('flex');
+            document.getElementById('dholGraphic').classList.remove('hidden');
+            updateDholProgress();
+        }
+
+        let dholReceptionTapCount = 0;
+        function openReceptionModal() {
+            dholReceptionTapCount = 0;
+            document.getElementById('ReceptionModal').classList.remove('hidden');
+            document.getElementById('receptionCardContent').classList.add('hidden');
+            document.getElementById('receptionCardContent').classList.remove('flex');
+            document.getElementById('dholReceptionGraphic').classList.remove('hidden');
+            updateReceptionDholProgress();
+        }
+
+        function tapDhol() {
+            dholTapCount++;
+            playDholSound();
+            
+            const graphic = document.getElementById('dholGraphic');
+            graphic.classList.add('dhol-vibrate');
+            setTimeout(() => graphic.classList.remove('dhol-vibrate'), 300);
+
+            updateDholProgress();
+
+            if (dholTapCount >= 5) {
+                forceRevealWedding();
+            }
+        }
+
+        function tapReceptionDhol() {
+            dholReceptionTapCount++;
+            playDholSound();
+            
+            const graphic = document.getElementById('dholReceptionGraphic');
+            graphic.classList.add('dhol-vibrate');
+            setTimeout(() => graphic.classList.remove('dhol-vibrate'), 300);
+
+            updateReceptionDholProgress();
+
+            if (dholReceptionTapCount >= 5) {
+                forceRevealReception();
+            }
+        }
+
+        function updateDholProgress() {
+            const dots = document.getElementById('dholDots').children;
+            for (let i = 0; i < dots.length; i++) {
+                if (i < dholTapCount) {
+                    dots[i].className = 'w-2.5 h-2.5 rounded-full bg-amber-300 shadow-[0_0_8px_#FCD34D]';
+                } else {
+                    dots[i].className = 'w-2.5 h-2.5 rounded-full bg-amber-900';
+                }
+            }
+            document.getElementById('dholStatusText').innerText = `TAP THE DHOL TO THE BEAT (${dholTapCount}/5)`;
+        }
+
+        function updateReceptionDholProgress() {
+            const dots = document.getElementById('dholReceptionDots').children;
+            for (let i = 0; i < dots.length; i++) {
+                if (i < dholReceptionTapCount) {
+                    dots[i].className = 'w-2.5 h-2.5 rounded-full bg-green-300 shadow-[0_0_8px_#FCD34D]';
+                } else {
+                    dots[i].className = 'w-2.5 h-2.5 rounded-full bg-green-800';
+                }
+            }
+            document.getElementById('dholReceptionStatusText').innerText = `TAP THE DHOL TO THE BEAT (${dholReceptionTapCount}/5)`;
+        }
+
+        function forceRevealWedding() {
+            document.getElementById('dholGraphic').classList.add('hidden');
+            document.getElementById('weddingCardContent').classList.remove('hidden');
+            document.getElementById('weddingCardContent').classList.add('flex');
+            document.getElementById('dholStatusText').innerText = '✦ THE WEDDING UNLOCKED! ✦';
+            confetti({ particleCount: 40, spread: 60 });
+        }
+
+        function forceRevealReception() {
+            document.getElementById('dholReceptionGraphic').classList.add('hidden');
+            document.getElementById('receptionCardContent').classList.remove('hidden');
+            document.getElementById('receptionCardContent').classList.add('flex');
+            document.getElementById('dholReceptionStatusText').innerText = '✦ THE RECEPTION UNLOCKED! ✦';
+            confetti({ particleCount: 40, spread: 60 });
+        }
+
+        // ================= TEAM BRIDE VS TEAM GROOM =================
+        let selectedTeam = null;
+
+        function selectTeam(team) {
+            selectedTeam = team;
+            const brideCard = document.getElementById('cardTeamBride');
+            const groomCard = document.getElementById('cardTeamGroom');
+            const badgeBride = document.getElementById('badgeBride');
+            const badgeGroom = document.getElementById('badgeGroom');
+            const statusText = document.getElementById('teamSelectionStatus');
+
+            if (team === 'bride') {
+                brideCard.className = 'cursor-pointer p-4 rounded-2xl bg-pink-50 border-2 border-pink-500 shadow-md relative flex flex-col items-center scale-105 transition-all';
+                groomCard.className = 'cursor-pointer p-4 rounded-2xl bg-white border-2 border-stone-200 opacity-60 shadow-sm relative flex flex-col items-center transition-all';
+                badgeBride.classList.remove('hidden');
+                badgeGroom.classList.add('hidden');
+                statusText.innerText = "You're cheering for Team Bride — Sneha! 🌸";
+            } else {
+                groomCard.className = 'cursor-pointer p-4 rounded-2xl bg-amber-50 border-2 border-amber-500 shadow-md relative flex flex-col items-center scale-105 transition-all';
+                brideCard.className = 'cursor-pointer p-4 rounded-2xl bg-white border-2 border-stone-200 opacity-60 shadow-sm relative flex flex-col items-center transition-all';
+                badgeGroom.classList.remove('hidden');
+                badgeBride.classList.add('hidden');
+                statusText.innerText = "You're cheering for Team Groom — Saran! 👑";
+            }
+
+            playSoundTone(587.33, 'sine', 0.2);
+            confetti({ particleCount: 25, spread: 40 });
+        }
+
+        // ================= COUNTDOWN TIMER =================
+        const targetDate = new Date('November 16, 2026 06:30:00').getTime();
+
+        function updateCountdown() {
+            const now = new Date().getTime();
+            const diff = targetDate - now;
+
+            if (diff > 0) {
+                const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                const secs = Math.floor((diff % (1000 * 60)) / 1000);
+
+                document.getElementById('timerDays').innerText = days.toString().padStart(2, '0');
+                document.getElementById('timerHours').innerText = hours.toString().padStart(2, '0');
+                document.getElementById('timerMins').innerText = mins.toString().padStart(2, '0');
+                document.getElementById('timerSecs').innerText = secs.toString().padStart(2, '0');
+            }
+        }
+        setInterval(updateCountdown, 1000);
+        updateCountdown();
+
+        // ================= RSVP FORM & WHATSAPP =================
+        let isAttending = true;
+        let selectedCelebrations = ['Engagement', 'Bridal Welcoming Ceremony', 'The Wedding', 'The Reception'];
+
+        function setAttendance(willAttend) {
+            isAttending = willAttend;
+            const btnYes = document.getElementById('btnAttendYes');
+            const btnNo = document.getElementById('btnAttendNo');
+
+            if (willAttend) {
+                btnYes.className = 'py-2.5 rounded-xl border border-amber-500 bg-amber-50 text-amber-900 font-bold text-xs flex items-center justify-center gap-1';
+                btnNo.className = 'py-2.5 rounded-xl border border-stone-200 text-stone-500 font-bold text-xs flex items-center justify-center gap-1';
+            } else {
+                btnNo.className = 'py-2.5 rounded-xl border border-rose-500 bg-rose-50 text-rose-900 font-bold text-xs flex items-center justify-center gap-1';
+                btnYes.className = 'py-2.5 rounded-xl border border-stone-200 text-stone-500 font-bold text-xs flex items-center justify-center gap-1';
+            }
+        }
+
+        function toggleCelebration(btn, celebName) {
+            const index = selectedCelebrations.indexOf(celebName);
+            if (index > -1) {
+                selectedCelebrations.splice(index, 1);
+                btn.className = 'celeb-pill px-3 py-2 rounded-xl border border-stone-200 bg-stone-100 text-stone-400 font-bold text-xs text-center';
+            } else {
+                selectedCelebrations.push(celebName);
+                btn.className = 'celeb-pill px-3 py-2 rounded-xl border border-amber-400 bg-amber-100 text-amber-900 font-bold text-xs text-center';
+            }
+        }
+
+        function handleRSVPSubmit(e) {
+            e.preventDefault();
+            const name = document.getElementById('rsvpName').value;
+            const guests = document.getElementById('rsvpGuests').value;
+            const team = selectedTeam ? (selectedTeam === 'bride' ? 'Team Bride (Sneha)' : 'Team Groom (Saran)') : 'Not specified';
+
+            let msg = `*RSVP for Sneha & Saran's Wedding*\n\n`;
+            msg += `*Name:* ${name}\n`;
+            msg += `*Attending:* ${isAttending ? 'Joyfully Yes! 🎉' : 'Regretfully No 💔'}\n`;
+            if (isAttending) {
+                msg += `*Guests:* ${guests}\n`;
+                msg += `*Events:* ${selectedCelebrations.join(', ')}\n`;
+            }
+            msg += `*Cheering For:* ${team}\n`;
+
+            const whatsappUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`;
+            window.open(whatsappUrl, '_blank');
+        }
+    </script>
+</body>
+</html>
