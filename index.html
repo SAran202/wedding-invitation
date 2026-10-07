@@ -298,6 +298,9 @@
             <i id="musicIcon" class="fas fa-music text-sm"></i>
         </button>
 
+        <!-- AUDIO ELEMENT FOR BACKGROUND MUSIC -->
+<audio id="bgMusic" src="bg-song.mp3" loop preload="auto"></audio>
+
         <!-- COVER / DOOR ENTRANCE SECTION -->
         <div id="doorOverlay" class="absolute inset-0 z-50 flex items-center justify-center bg-stone-950 door-container">
             <!-- Left Door -->
@@ -834,37 +837,51 @@
         }
 
         function toggleAudio() {
-            isMuted = !isMuted;
-            const btn = document.getElementById('musicToggleBtn');
-            const icon = document.getElementById('musicIcon');
-            if (isMuted) {
-                btn.classList.add('opacity-50');
-                icon.className = 'fas fa-volume-mute text-sm';
-            } else {
-                btn.classList.remove('opacity-50');
-                icon.className = 'fas fa-music text-sm';
-                playSoundTone(440, 'sine', 0.2);
-            }
-        }
+    const bgMusic = document.getElementById('bgMusic');
+    const btn = document.getElementById('musicToggleBtn');
+    const icon = document.getElementById('musicIcon');
 
-        // ================= DOOR OPEN ANIMATION =================
-        function openDoor() {
-            const doorOverlay = document.getElementById('doorOverlay');
-            playSoundTone(523.25, 'sine', 0.4); // C5 tone
-            setTimeout(() => playSoundTone(659.25, 'sine', 0.5), 150); // E5 tone
-            
-            doorOverlay.classList.add('doors-open');
-            setTimeout(() => {
-                doorOverlay.style.display = 'none';
-            }, 500);
+    if (!bgMusic) return;
 
-            // Fire confetti celebration on entrance
-            confetti({
-                particleCount: 50,
-                spread: 60,
-                origin: { y: 0.6 }
-            });
-        }
+    if (bgMusic.paused || isMuted) {
+        // Unmute and Play
+        bgMusic.muted = false;
+        isMuted = false;
+        bgMusic.play().catch(err => console.log("Playback error:", err));
+        btn.classList.remove('opacity-50');
+        icon.className = 'fas fa-music text-sm';
+    } else {
+        // Mute / Pause
+        bgMusic.muted = true;
+        isMuted = true;
+        btn.classList.add('opacity-50');
+        icon.className = 'fas fa-volume-mute text-sm';
+    }
+}
+
+// ================= DOOR OPEN ANIMATION =================
+function openDoor() {
+    const doorOverlay = document.getElementById('doorOverlay');
+    const bgMusic = document.getElementById('bgMusic');
+
+    // Play background audio on user interaction
+    if (bgMusic) {
+        bgMusic.muted = false;
+        bgMusic.play().catch(err => console.log("Audio autoplay prevented:", err));
+    }
+    
+    doorOverlay.classList.add('doors-open');
+    setTimeout(() => {
+        doorOverlay.style.display = 'none';
+    }, 500);
+
+    // Fire confetti celebration on entrance
+    confetti({
+        particleCount: 50,
+        spread: 60,
+        origin: { y: 0.6 }
+    });
+}
 
         // ================= FLOATING PETALS CANVAS =================
         const petalCanvas = document.getElementById('petalCanvas');
